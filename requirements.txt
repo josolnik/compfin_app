@@ -5,3 +5,4 @@ pandas==0.25.1
 seaborn==0.9.0
 plotly==4.11.0
 yfinance==0.1.54
+pyportfolioopt==1.2.6
