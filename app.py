@@ -32,27 +32,44 @@ APPS = OrderedDict(
             (
                 utils.price_simulator,
                 """
-This app visualizes price simulation of a chosen asset using [Geometric Brownian motion (GBM)](https://en.wikipedia.org/wiki/Geometric_Brownian_motion).
+            This tool visualizes price simulation of a chosen asset using [Geometric Brownian motion (GBM)](https://en.wikipedia.org/wiki/Geometric_Brownian_motion).
 
-The model processes historical data and simulates different pathways of how the prices could move over time.
+            The model processes historical data and simulates different pathways of how the prices could evolve over time.
 
-  We simulate asset prices in September 2020 and take into account historical data between January 2020 and August 2020. We then compare the simulated and realized prices (ground truth).
-  For this reason we also don't include the last month's price data for training of the simulation model, only for validating the final results.
-
-  There are two inputs into the model:
-  - Which asset's price to simulate
-  - How many simulations to perform
-
-You can play with both and see how the output changes.
-
-  Some of the questions we might ask:
-  - Is the simulation model aligned with the simulated price levels? Or is too optimistic/pessimistic?
-  - How does accuracy of the simulation change across different assets? Why is that?
-  - How does the simulation results change when we change the number of simulations to run?
+            We simulate asset prices in November 2020 and take into account historical data between January 2020 and October 2020. We then compare the simulated and realized prices (ground truth).
+            For this reason we also don't include the last month's price data for training of the simulation model, only for validating the final results.
 
 """,
             )
         ),
+
+        (
+            "Risk Estimator",
+            (
+                utils.risk_estimator,
+
+                """
+                
+            We would like to evaluate portfolio risk with a metric that estimates worst expected loss.
+
+            For this we use [value-at-risk (VaR)](https://en.wikipedia.org/wiki/Value_at_risk) measure which reports this value at a given level of confidence over a certain time horizon and under normal market conditions.
+
+            To get a better intuitive understanding, it's best to look at an example: If the 1-day 95% VaR of our portfolio is $100 this means that 95% of the time (under normal market conditions), we will not lose more than $100 by holding our portfolio over one day.
+
+            There are various ways to calculate VaR. We will be focusing here on using Monte Carlo simulations.
+
+            The portfolio is preset and assumes 1 share owned in each of the [FAANG](https://www.investopedia.com/terms/f/faang-stocks.asp) companies. For this portfolio, we evaluate risk using the VaR metric from individual security prices.
+
+            For the simulations, we take into account historical price data since 2018-01-01 until the day before analysis (t-1).
+
+            It's worth mentioning that the analysis is a toy example and should be taken with a fist of salt. The metric we're using doesn't take into account potential [Black Swan](https://en.wikipedia.org/wiki/Black_swan_theory) events and is in general not capturing enough [tail risks](https://www.investopedia.com/terms/t/tailrisk.asp).
+
+        """,
+
+      )
+
+        ),
+
         (
             "Portfolio Optimizer",
             (
@@ -62,7 +79,7 @@ You can play with both and see how the output changes.
             used to invest in a diversified basket of assets.
 
             To go even further, we can optimize* our portfolio to invest across multiple ETFs.
-            Below you can find a selection of [top 10 most traded ETFs](https://finance.yahoo.com/etfs/) (as of October 10th 2020) with a short 
+            Below you can find a selection of some of the [most traded ETFs](https://finance.yahoo.com/etfs/) with a short 
             description. Besides that, you can find historical data of how their prices moved in the last 5 years.
 
             You define two inputs:
@@ -80,11 +97,11 @@ You can play with both and see how the output changes.
 
 
 def run():
-    app_name = st.sidebar.selectbox("Choose one of the apps", list(APPS.keys()), 0)
+    app_name = st.sidebar.selectbox("Choose one of the tools", list(APPS.keys()), 0)
     app = APPS[app_name][0]
 
     if app_name == "—":
-        st.write("# Welcome to the CompFin data app! 👋")
+        st.write("# Welcome to the CompFin app! 👋")
     else:
         st.markdown("# %s" % app_name)
         description = APPS[app_name][1]
