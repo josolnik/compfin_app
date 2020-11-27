@@ -69,7 +69,7 @@ def price_simulator():
     ('FB', 'AMZN', 'AAPL', 'NFLX', 'GOOG'))
     N_SIM = st.number_input('Number of simulations to run (choose between 10 and 1000): ', min_value=10, max_value=1000)
 
-    if st.checkbox("Got it, let's run the model!"):
+    if st.checkbox("All set, let's run the model!"):
 
       START_DATE = '2020-01-01' 
       END_DATE = '2020-11-30'
@@ -206,7 +206,7 @@ def risk_estimator():
       'Choose VaR (value-at-risk) confidence level'
       , (confidence_levels))
 
-  if st.checkbox("Got it, let's run the model!"):
+  if st.checkbox("All set, let's run the model!"):
 
     # calculations
 
