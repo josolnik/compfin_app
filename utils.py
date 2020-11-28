@@ -23,7 +23,7 @@ def intro():
     st.markdown(
         """
         
-        This is a collection of three data tools for you to explore modeling of risk in investing:
+        This is a collection of three data tools for you to explore risk modeling in finance.
 
         - **Price Simulator** (Simulating asset prices with the Monte Carlo method)
         - **Risk Estimator** (Evaluating portfolio risk with the VaR metric)
@@ -59,13 +59,13 @@ def price_simulator():
     You can play with both and see how the output changes.
 
     Some of the questions we might ask:
-    - Is the simulation model aligned with the simulated price levels? Or is too optimistic/pessimistic?
+    - Is the simulation model aligned with the simulated price levels? Or is it too optimistic/pessimistic?
     - How does accuracy of the simulation change across different assets? Why is that?
     - How does the simulation results change when we change the number of simulations to run?
 
 """)
 
-    RISKY_ASSET = st.radio("Asset to simulate:",
+    RISKY_ASSET = st.radio("Asset price to simulate:",
     ('FB', 'AMZN', 'AAPL', 'NFLX', 'GOOG'))
     N_SIM = st.number_input('Number of simulations to run (choose between 10 and 1000): ', min_value=10, max_value=1000)
 
@@ -74,9 +74,7 @@ def price_simulator():
       START_DATE = '2020-01-01' 
       END_DATE = '2020-11-30'
 
-      # data_load_state = st.text('Loading data...')
       data = load_data(RISKY_ASSET, START_DATE, END_DATE)
-      # data_load_state.text("Data loaded!")
 
       adj_close = data['Adj Close'] 
       returns = adj_close.pct_change().dropna()
@@ -119,9 +117,9 @@ def price_simulator():
       gbm_simulations_df = pd.DataFrame(np.transpose(gbm_simulations), index=index)
 
       fig = px.line(gbm_simulations_df, x=index, y=gbm_simulations_df.mean(axis=1), title=PLOT_TITLE, labels={'x': 'Date', 'y': 'Adj. Close Price USD ($)'})
-      fig.update_traces(name='Average value', showlegend = True)
+      fig.update_traces(name='Average simulated value', showlegend = True)
 
-      fig.add_scatter(x=index, y=adj_close[LAST_TRAIN_DATE:LAST_TEST_DATE], mode='lines', name='Realized value') #  showlegend=False)
+      fig.add_scatter(x=index, y=adj_close[LAST_TRAIN_DATE:LAST_TEST_DATE], mode='lines', name='Realized value')
 
       for sim_num in gbm_simulations_df.columns:
         fig.add_scatter(x=index, y=gbm_simulations_df[sim_num], mode='lines', opacity=0.05, showlegend=False)
@@ -247,7 +245,7 @@ def risk_estimator():
 
     var_index = confidence_levels.index(confidence_level)
     var_value = var[var_index]
-    var_portfolio_return = ((var_value + P_0)/ P_0)*100
+    var_portfolio_return = (((var_value + P_0)/ P_0) - 1)*100
 
     st.markdown("---")
 
@@ -304,15 +302,11 @@ def portfolio_optimizer():
   st.markdown("---")
   st.subheader("ETF list")
 
-  # Show ETF metadata
   etfs_metadata_df = pd.DataFrame.from_dict(etfs_meta, orient='index').reset_index().rename(columns={"index": "Ticker", 0: "Short description"})
   st.table(etfs_metadata_df)
 
   st.markdown("---")
   st.subheader("Historical prices")
-
-  # Visualize historical prices
-  # title = 'Historical Adj. Close Price of available ETFs'
 
   df_temp = df.copy()
   df_temp['Date'] = df_temp.index

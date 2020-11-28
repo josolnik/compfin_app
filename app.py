@@ -32,11 +32,13 @@ APPS = OrderedDict(
             (
                 utils.price_simulator,
                 """
-            This tool visualizes price simulation of a chosen asset using [Geometric Brownian motion (GBM)](https://en.wikipedia.org/wiki/Geometric_Brownian_motion).
 
-            The model processes historical data and simulates different pathways of how the prices could evolve over time.
+            We would like to simulate how a certain asset's price might evolve over time.
 
-            We simulate asset prices in November 2020 and take into account historical data between January 2020 and October 2020. We then compare the simulated and realized prices (ground truth).
+            We simulate [Geometric Brownian motion (GBM)](https://en.wikipedia.org/wiki/Geometric_Brownian_motion) by using historical price patterns. 
+            To do that, we use [Monte Carlo method](https://en.wikipedia.org/wiki/Monte_Carlo_method) to draw a sample at random from the empirical distribution and aim to approximate an expectation of a function that would otherwise be probably impossible to compute in an efficient way. This method also gives us desirable properties of estimators, such as consistency, unbiasedness.
+
+            Simulation is performed one month in advance (November 2020) while taking into account historical data between January 2020 and October 2020. We then compare the simulated and realized prices (ground truth).
             For this reason we also don't include the last month's price data for training of the simulation model, only for validating the final results.
 
 """,
@@ -52,17 +54,20 @@ APPS = OrderedDict(
                 
             We would like to evaluate portfolio risk with a metric that estimates worst expected loss.
 
-            For this we use [value-at-risk (VaR)](https://en.wikipedia.org/wiki/Value_at_risk) measure which reports this value at a given level of confidence over a certain time horizon and under normal market conditions.
+            For this we use [value-at-risk (VaR)](https://en.wikipedia.org/wiki/Value_at_risk) measure which reports this value at a given level of confidence over a certain time horizon and under normal market conditions. It's often used in the industry to estimate the amount of assets needed to cover possible losses. Under the hood, it's based on a hypothetical profit-and-loss probability density function. 
 
             To get a better intuitive understanding, it's best to look at an example: If the 1-day 95% VaR of our portfolio is $100 this means that 95% of the time (under normal market conditions), we will not lose more than $100 by holding our portfolio over one day.
 
-            There are various ways to calculate VaR. We will be focusing here on using Monte Carlo simulations.
+            There are various ways to calculate VaR. We will be using the [Monte Carlo method](https://en.wikipedia.org/wiki/Monte_Carlo_method).
 
-            The portfolio is preset and assumes 1 share owned in each of the [FAANG](https://www.investopedia.com/terms/f/faang-stocks.asp) companies. For this portfolio, we evaluate risk using the VaR metric from individual security prices.
+            While the metric gives nice properties for ease of communicating risk, it has its downsides when it comes to strong assumptions about the distribution of market dynamics.
+            To put it bluntly, David Einhorn compared VaR to "an airbag that works all the time, except when you have a car accident". By this he meant that VaR measure fails to take into account [Black Swan](https://en.wikipedia.org/wiki/Black_swan_theory) events and [tail risks](https://www.investopedia.com/terms/t/tailrisk.asp) in general.
+            
+            That being said, it gives a good intuitive understanding of economic mechanisms if we understand the model's limitations.
+
+            We model portfolio risk of a preset portfolio. We assume ownership of 1 share in each of the [FAANG](https://www.investopedia.com/terms/f/faang-stocks.asp) companies. For this portfolio, we evaluate risk using the VaR metric from individual security prices.
 
             For the simulations, we take into account historical price data since 2018-01-01 until the day before analysis (t-1).
-
-            It's worth mentioning that the analysis is a toy example and should be taken with a fist of salt. The metric we're using doesn't take into account potential [Black Swan](https://en.wikipedia.org/wiki/Black_swan_theory) events and is in general not capturing enough [tail risks](https://www.investopedia.com/terms/t/tailrisk.asp).
 
         """,
 
@@ -75,7 +80,9 @@ APPS = OrderedDict(
             (
                 utils.portfolio_optimizer,
                 """
-            We would like to optimize our portfolio's return while taking into account risk of individual assets. One of the best ways for that is to invest our funds into a set of [ETFs (exchange traded funds)](https://www.investopedia.com/terms/e/etf.asp) . ETFs are affordable and well established financial products
+            We would like to optimize our portfolio's return while taking into account risk of individual assets. 
+            
+            One of the best ways for that is to invest our funds into a set of [ETFs (exchange traded funds)](https://www.investopedia.com/terms/e/etf.asp) . ETFs are affordable and well established financial products
             used to invest in a diversified basket of assets.
 
             To go even further, we can optimize* our portfolio to invest across multiple ETFs.
