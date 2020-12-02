@@ -1,6 +1,6 @@
 # CompFin app repo
 
-This is a collection of three data tools for you to explore computational modeling in finance:
+This is a collection of three data tools to explore computational modeling in finance:
 
 - **Price Simulator** (Simulating asset prices with the Monte Carlo method)
 - **Risk Estimator** (Evaluating portfolio risk with the VaR metric)
