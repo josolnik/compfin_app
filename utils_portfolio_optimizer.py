@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 import streamlit as st
+import seaborn as sns
 import plotly.graph_objects as go
 import plotly.express as px
 import yfinance as yf
@@ -67,7 +68,7 @@ def main():
   st.write('Your chosen amount is', '$' + str(investment_amount))
 
 
-  if st.checkbox("All set, let's run the optimization model!"):
+  if st.checkbox("All set, let's run the model!"):
 
       df = df[etfs_chosen]
 

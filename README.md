@@ -8,4 +8,4 @@ This is a collection of three data tools for you to explore modeling of risk in 
 
 This [web app](https://compfin-app.herokuapp.com/) is deployed on Heroku.
 
-Simulation code largely taken from [Python from Finance Cookbook](https://www.amazon.com/Python-Finance-Cookbook-libraries-financial/dp/1789618517)
+Simulation methodology taken from [Python from Finance Cookbook](https://www.amazon.com/Python-Finance-Cookbook-libraries-financial/dp/1789618517)

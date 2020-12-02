@@ -14,13 +14,11 @@ def main():
         - **Risk Estimator** (Evaluating portfolio risk with the VaR metric)
         - **Portfolio optimizer** (Optimizing ETF portfolio with mean-variance analysis)
 
-        **👈 Select the one you're interested in on the left**
-
       &nbsp;
 
-      [Github repo with all the code](https://github.com/josolnik/compfin_app)
+      [Github repo](https://github.com/josolnik/compfin_app)
       
-       Simulation code largely taken from [Python from Finance Cookbook](https://www.amazon.com/Python-Finance-Cookbook-libraries-financial/dp/1789618517)
+      Simulation methodology taken from [Python from Finance Cookbook](https://www.amazon.com/Python-Finance-Cookbook-libraries-financial/dp/1789618517)
     
     """
     )

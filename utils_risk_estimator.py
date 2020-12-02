@@ -25,10 +25,9 @@ def main():
   # t-1
   END_DATE = (date.today() - timedelta(days=1)).strftime("%Y-%m-%d") 
 
-  n_sims = 10 ** 5
-
-  percentiles = [0.01, 0.1, 1, 5, 10] 
-  confidence_levels = [100 - value for value in percentiles]
+  N_SIMS = 10 ** 5
+  PERCENTILES = [0.01, 0.1, 1, 5, 10] 
+  CONFIDENCE_LEVELS = [100 - value for value in PERCENTILES]
 
   @st.cache
   def load_data(products, start, end):
@@ -71,7 +70,7 @@ def main():
 
   confidence_level = st.selectbox(
       'Choose VaR (value-at-risk) confidence level'
-      , (confidence_levels))
+      , (CONFIDENCE_LEVELS))
 
   if st.checkbox("All set, let's run the model!"):
 
@@ -84,7 +83,7 @@ def main():
     chol_mat = np.linalg.cholesky(cov_mat)
 
     # draw the correlated random numbers from the Standard Normal distribution
-    rv = np.random.normal(size=(n_sims, len(securities)))
+    rv = np.random.normal(size=(N_SIMS, len(securities)))
     correlated_rv = np.transpose(np.matmul(chol_mat, np.transpose(rv)))
 
     # define the metrics that will be used for the simulations
@@ -110,9 +109,9 @@ def main():
 
     # calculate the VaR for the selected confidence levels
     P_diff_sorted = np.sort(P_diff) 
-    var = np.percentile(P_diff_sorted, percentiles)
+    var = np.percentile(P_diff_sorted, PERCENTILES)
 
-    var_index = confidence_levels.index(confidence_level)
+    var_index = CONFIDENCE_LEVELS.index(confidence_level)
     var_value = var[var_index]
 
     st.markdown("---") 

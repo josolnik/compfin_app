@@ -26,7 +26,7 @@ LOGGER = get_logger(__name__)
 # app_name -> (app_function, app_description)
 APPS = OrderedDict(
     [
-        ("—", (utils_intro.main, None)),
+        ("—", (utils_intro.main, '-')),
         (
             "Price Simulator",
             (
@@ -36,7 +36,7 @@ APPS = OrderedDict(
             We would like to simulate how a certain asset's price might evolve over time.
 
             We simulate [Geometric Brownian motion (GBM)](https://en.wikipedia.org/wiki/Geometric_Brownian_motion) by using historical price patterns. 
-            To do that, we use [Monte Carlo method](https://en.wikipedia.org/wiki/Monte_Carlo_method) to draw a sample at random from the empirical distribution and aim to approximate an expectation of a function that would otherwise be probably impossible to compute in an efficient way. This method also gives us desirable properties of estimators, such as consistency, unbiasedness.
+            To do that, we use [Monte Carlo method](https://en.wikipedia.org/wiki/Monte_Carlo_method) to draw a sample at random from the empirical distribution and aim to approximate an expectation of a function that would otherwise be probably impossible to compute in an efficient way.
 
             Simulation is performed one month in advance (November 2020) while taking into account historical data between January 2020 and October 2020. We then compare the simulated and realized prices (ground truth).
             For this reason we also don't include the last month's price data for training of the simulation model, only for validating the final results.
@@ -82,16 +82,16 @@ APPS = OrderedDict(
                 """
             We would like to optimize our portfolio's return while taking into account risk of individual assets. 
             
-            One of the best ways for that is to invest our funds into a set of [ETFs (exchange traded funds)](https://www.investopedia.com/terms/e/etf.asp) . ETFs are affordable and well established financial products
+            One of the best ways for that is to invest our funds into a set of [ETFs (exchange-traded funds)](https://www.investopedia.com/terms/e/etf.asp) . ETFs are affordable and well established financial products
             used to invest in a diversified basket of assets.
 
-            To go even further, we can optimize* our portfolio to invest across multiple ETFs.
+            To go even further, we can optimize* our portfolio to invest in multiple ETFs.
             Below you can find a selection of some of the [most traded ETFs](https://finance.yahoo.com/etfs/) with a short 
             description. Besides that, you can find historical data of how their prices moved in the last 5 years.
 
             You define two inputs:
 
-            - ETFs to potentially add into your portfolio (we determine which are included in the optimized portfolio with the model)
+            - ETFs to potentially add to your portfolio (we determine which are included in the optimized portfolio with the model)
             - Investment amount (as ETFs are traded in discrete amounts you might have some residual amount)
 
             *To optimize performance we use MVO ([mean-variance optimization](https://en.wikipedia.org/wiki/Modern_portfolio_theory)) to maximize the portfolio's Sharpe ratio (risk-adjusted return). We show discrete quantities of how to distribute
@@ -108,7 +108,7 @@ def run():
     app = APPS[app_name][0]
 
     if app_name == "—":
-        st.write("# Welcome to the CompFin app! 👋")
+        st.write("# CompFin")
     else:
         st.markdown("# %s" % app_name)
         description = APPS[app_name][1]
