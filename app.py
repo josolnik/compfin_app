@@ -108,7 +108,7 @@ def run():
     app = APPS[app_name][0]
 
     if app_name == "—":
-        st.write("# CompFin")
+        st.write("# CompFin 📈")
     else:
         st.markdown("# %s" % app_name)
         description = APPS[app_name][1]
