@@ -1,8 +1,6 @@
 import numpy as np
 import pandas as pd
 import streamlit as st
-import matplotlib.pyplot as plt
-import seaborn as sns
 plt.style.use('seaborn-whitegrid')
 import plotly.graph_objects as go
 import plotly.express as px
@@ -15,129 +13,9 @@ from pypfopt.risk_models import CovarianceShrinkage
 from pypfopt.plotting import plot_covariance
 from pypfopt.discrete_allocation import DiscreteAllocation, get_latest_prices
 
-
-def intro():
-
-    st.sidebar.success("Select one of the options above.")
-
-    st.markdown(
-        """
-        
-        This is a collection of three data tools for you to explore risk modeling in finance.
-
-        - **Price Simulator** (Simulating asset prices with the Monte Carlo method)
-        - **Risk Estimator** (Evaluating portfolio risk with the VaR metric)
-        - **Portfolio optimizer** (Optimizing ETF portfolio with mean-variance analysis)
-
-        **👈 Select the one you're interested in on the left**
-
-      &nbsp;
-
-      [Github repo with all the code](https://github.com/josolnik/compfin_app)
-      
-       Simulation code largely taken from [Python from Finance Cookbook](https://www.amazon.com/Python-Finance-Cookbook-libraries-financial/dp/1789618517)
-    
-    """
-    )
-
-def price_simulator():
-
-    @st.cache
-    def load_data(asset, start, end):
-        df = yf.download(asset, start=start, end=end, adjusted=True)
-        return df
-
-    st.markdown("---")
-    st.subheader("Parameters")
-
-    st.markdown("""
-
-    There are two inputs into the model:
-    - Which asset's price to simulate
-    - How many simulations to perform
-
-    You can play with both and see how the output changes.
-
-    Some of the questions we might ask:
-    - Is the simulation model aligned with the simulated price levels? Or is it too optimistic/pessimistic?
-    - How does accuracy of the simulation change across different assets? Why is that?
-    - How does the simulation results change when we change the number of simulations to run?
-
-""")
-
-    RISKY_ASSET = st.radio("Asset price to simulate:",
-    ('FB', 'AMZN', 'AAPL', 'NFLX', 'GOOG'))
-    N_SIM = st.number_input('Number of simulations to run (choose between 10 and 1000): ', min_value=10, max_value=1000)
-
-    if st.checkbox("All set, let's run the model!"):
-
-      START_DATE = '2020-01-01' 
-      END_DATE = '2020-11-30'
-
-      data = load_data(RISKY_ASSET, START_DATE, END_DATE)
-
-      adj_close = data['Adj Close'] 
-      returns = adj_close.pct_change().dropna()
-
-      train = returns['2020-01-01':'2020-10-31'] 
-      test = returns['2020-11-01':'2020-11-30']
-
-      T = len(test)
-      N = len(test)
-      S_0 = adj_close[train.index[-1].date()]
-      mu = train.mean()
-      sigma = train.std()
-
-      @st.cache
-      def simulate_gbm(s_0, mu, sigma, n_sims, T, N):
-
-        dt = T/N
-        dW = np.random.normal(scale = np.sqrt(dt), size=(n_sims, N))
-        W = np.cumsum(dW, axis=1)
-
-        time_step = np.linspace(dt, T, N) 
-        time_steps = np.broadcast_to(time_step, (n_sims, N))
-
-        S_t = s_0 * np.exp((mu - 0.5 * sigma ** 2) * time_steps + sigma * W) 
-        S_t = np.insert(S_t, 0, s_0, axis=1) 
-        
-        return S_t
-
-      gbm_simulations = simulate_gbm(S_0, mu, sigma, N_SIM, T, N)
-
-      # prepare objects for plotting
-      LAST_TRAIN_DATE = train.index[-1].date()
-      FIRST_TEST_DATE = test.index.min().date()
-      LAST_TEST_DATE = test.index.max().date()
-      PLOT_TITLE = (f'{RISKY_ASSET} Simulation ' f'(from {FIRST_TEST_DATE} till {LAST_TEST_DATE})')
-
-      selected_indices = adj_close[LAST_TRAIN_DATE:LAST_TEST_DATE].index
-      index = [date.date() for date in selected_indices]
-
-      gbm_simulations_df = pd.DataFrame(np.transpose(gbm_simulations), index=index)
-
-      fig = px.line(gbm_simulations_df, x=index, y=gbm_simulations_df.mean(axis=1), title=PLOT_TITLE, labels={'x': 'Date', 'y': 'Adj. Close Price USD ($)'})
-      fig.update_traces(name='Average simulated value', showlegend = True)
-
-      fig.add_scatter(x=index, y=adj_close[LAST_TRAIN_DATE:LAST_TEST_DATE], mode='lines', name='Realized value')
-
-      for sim_num in gbm_simulations_df.columns:
-        fig.add_scatter(x=index, y=gbm_simulations_df[sim_num], mode='lines', opacity=0.05, showlegend=False)
-
-      st.plotly_chart(fig)
-
-      if st.checkbox('Show sample raw data'):
-          st.subheader('Raw data')
-          st.write(data.head(50))
-
-      if st.checkbox('Show historical returns'):
-        chart_data = pd.DataFrame(
-            returns.values,
-            returns.index.values)
-        st.line_chart(chart_data)
-        st.write(f'Average return: {100 * returns.mean():.2f}%')
   
 def risk_estimator():
+
   portfolio_metadata = { 'FB': ['Facebook, Inc.', 1]
           , 'AMZN': ['Amazon.com', 1]
           , 'AAPL': ['Apple', 1]
@@ -150,9 +28,9 @@ def risk_estimator():
   shares = [item[1] for item in portfolio_metadata.values()]
 
   # setting time frame for historical data
-  start_date = '2018-01-01'
+  START_DATE = '2018-01-01'
   # t-1
-  end_date = (date.today() - timedelta(days=1)).strftime("%Y-%m-%d") 
+  END_DATE = (date.today() - timedelta(days=1)).strftime("%Y-%m-%d") 
 
   n_sims = 10 ** 5
 
@@ -164,7 +42,7 @@ def risk_estimator():
       df = yf.download(" ".join(products), start=start, end=end)['Adj Close']
       return df
 
-  df = load_data(securities, start_date, end_date)
+  df = load_data(securities, START_DATE, END_DATE)
   latest_prices = pd.DataFrame(df.columns, df.values[-1, :]).reset_index().rename(columns={'index': 'Price', 0: 'Ticker'})
   latest_prices['Price'] = ['$' + str('%.2f') % item for item in latest_prices['Price']]
   returns = df.pct_change().dropna()
@@ -245,14 +123,12 @@ def risk_estimator():
 
     var_index = confidence_levels.index(confidence_level)
     var_value = var[var_index]
-    var_portfolio_return = (((var_value + P_0)/ P_0) - 1)*100
 
-    st.markdown("---")
+    st.markdown("---") 
 
     st.subheader("VaR metrics")
     st.markdown(f"Initial portfolio value: ${P_0:.2f}")
     st.markdown(f"{T}-day VaR with {confidence_level}% confidence: ${var_value:.2f}")
-    st.markdown(f"VaR portfolio gain/loss: {var_portfolio_return :.2f}%")
 
     fig = px.histogram(P_diff)
     fig.update_traces(name='value', showlegend = True)
@@ -321,8 +197,8 @@ def portfolio_optimizer():
   'Which ETFs would you like to potentially add into your portfolio? (recommended to include all)',
   etfs_options, default=etfs_options)
 
-  investment_amount = st.number_input('Investment amount (between 1000 and 10000)', min_value=1000, max_value=10000)
-  st.write('Your chosen amount is ', investment_amount)
+  investment_amount = st.slider('Investment amount (between 1000 and 10000)', 1000, 10000, 1000)
+  st.write('Your chosen amount is', '$' + str(investment_amount))
 
 
   if st.checkbox("All set, let's run the optimization model!"):

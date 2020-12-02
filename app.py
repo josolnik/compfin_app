@@ -18,7 +18,7 @@ from collections import OrderedDict
 
 import streamlit as st
 from streamlit.logger import get_logger
-import utils
+import utils_intro, utils_price_simulator, utils_risk_estimator, utils_portfolio_optimizer
 
 LOGGER = get_logger(__name__)
 
@@ -26,11 +26,11 @@ LOGGER = get_logger(__name__)
 # app_name -> (app_function, app_description)
 APPS = OrderedDict(
     [
-        ("—", (utils.intro, None)),
+        ("—", (utils_intro.main, None)),
         (
             "Price Simulator",
             (
-                utils.price_simulator,
+                utils_price_simulator.main,
                 """
 
             We would like to simulate how a certain asset's price might evolve over time.
@@ -48,7 +48,7 @@ APPS = OrderedDict(
         (
             "Risk Estimator",
             (
-                utils.risk_estimator,
+                utils_risk_estimator.main,
 
                 """
                 
@@ -78,7 +78,7 @@ APPS = OrderedDict(
         (
             "Portfolio Optimizer",
             (
-                utils.portfolio_optimizer,
+                utils_portfolio_optimizer.main,
                 """
             We would like to optimize our portfolio's return while taking into account risk of individual assets. 
             
