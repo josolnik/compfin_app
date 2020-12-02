@@ -11,7 +11,7 @@ def main():
 
     @st.cache
     def load_data(asset, start, end):
-        df = yf.download(asset, start=start, end=end, adjusted=True)['Adj Close'] 
+        df = yf.download(asset, start=start, end=end, adjusted=True)['Adj Close']
         return df
 
     @st.cache
@@ -32,10 +32,9 @@ def main():
     START_DATE = '2020-01-01' 
     END_DATE = '2020-11-30'
 
-    securities = ['FB', 'AMZN', 'AAPL', 'NFLX', 'GOOG']
+    SECURITIES = ['FB', 'AMZN', 'AAPL', 'NFLX', 'GOOG']
 
-    df = load_data(securities, START_DATE, END_DATE)
-    returns = df.pct_change().dropna()
+    df = load_data(SECURITIES, START_DATE, END_DATE)
 
     st.markdown("---")
     st.subheader("Historical prices")
@@ -65,50 +64,46 @@ def main():
     """)
 
     RISKY_ASSET = st.radio("Asset price to simulate:",
-    (securities))
+    (SECURITIES))
+
+    adj_close = df[RISKY_ASSET]
+    returns = adj_close.pct_change().dropna()
+
     N_SIM = st.number_input('Number of simulations to run (choose between 10 and 1000): ', min_value=10, max_value=1000)
 
     if st.checkbox("All set, let's run the model!"):
 
-      train = returns[START_DATE:'2020-10-31'] 
-      test = returns['2020-11-01':END_DATE]
+        train = returns[START_DATE:'2020-10-31']
+        test = returns['2020-11-01':END_DATE]
 
-      T = len(test)
-      N = len(test)
-      S_0 = df[train.index[-1].date()]
-      mu = train.mean()
-      sigma = train.std()
+        T = len(test)
+        N = len(test)
+        S_0 = adj_close[train.index[-1].date()]
+        mu = train.mean()
+        sigma = train.std()
 
-      gbm_simulations = simulate_gbm(S_0, mu, sigma, N_SIM, T, N)
+        gbm_simulations = simulate_gbm(S_0, mu, sigma, N_SIM, T, N)
 
-      # prepare objects for plotting
-      LAST_TRAIN_DATE = train.index[-1].date()
-      FIRST_TEST_DATE = test.index.min().date()
-      LAST_TEST_DATE = test.index.max().date()
-      PLOT_TITLE = (f'{RISKY_ASSET} Simulation ' f'(from {FIRST_TEST_DATE} till {LAST_TEST_DATE})')
+        # prepare objects for plotting
+        LAST_TRAIN_DATE = train.index[-1].date()
+        FIRST_TEST_DATE = test.index.min().date()
+        LAST_TEST_DATE = test.index.max().date()
+        PLOT_TITLE = (f'{RISKY_ASSET} Simulation ' f'(from {FIRST_TEST_DATE} till {LAST_TEST_DATE})')
 
-      selected_indices = df[LAST_TRAIN_DATE:LAST_TEST_DATE].index
-      index = [date.date() for date in selected_indices]
+        selected_indices = adj_close[LAST_TRAIN_DATE:LAST_TEST_DATE].index
+        index = [date.date() for date in selected_indices]
 
-      gbm_simulations_df = pd.DataFrame(np.transpose(gbm_simulations), index=index)
+        gbm_simulations_df = pd.DataFrame(np.transpose(gbm_simulations), index=index)
 
-      fig = px.line(gbm_simulations_df, x=index, y=gbm_simulations_df.mean(axis=1), title=PLOT_TITLE, labels={'x': 'Date', 'y': 'Adj. Close Price USD ($)'})
-      fig.update_traces(name='Average simulated value', showlegend = True)
+        fig = px.line(gbm_simulations_df, x=index, y=gbm_simulations_df.mean(axis=1), title=PLOT_TITLE, labels={'x': 'Date', 'y': 'Adj. Close Price USD ($)'})
+        fig.update_traces(name='Average simulated value', showlegend = True)
 
-      fig.add_scatter(x=index, y=df[LAST_TRAIN_DATE:LAST_TEST_DATE], mode='lines', name='Realized value')
+        fig.add_scatter(x=index, y=adj_close[LAST_TRAIN_DATE:LAST_TEST_DATE], mode='lines', name='Realized value')
 
-      for sim_num in gbm_simulations_df.columns:
-        fig.add_scatter(x=index, y=gbm_simulations_df[sim_num], mode='lines', opacity=0.05, showlegend=False)
+        for sim_num in gbm_simulations_df.columns:
+            fig.add_scatter(x=index, y=gbm_simulations_df[sim_num], mode='lines', opacity=0.05, showlegend=False)
+        st.plotly_chart(fig)
 
-      st.plotly_chart(fig)
-
-      if st.checkbox('Show sample raw data'):
-          st.subheader('Raw data')
-          st.write(df.head(50))
-
-      if st.checkbox('Show historical returns'):
-        chart_data = pd.DataFrame(
-            returns.values,
-            returns.index.values)
-        st.line_chart(chart_data)
-        st.write(f'Average return: {100 * returns.mean():.2f}%')
+        if st.checkbox('Show sample raw data'):
+            st.subheader('Raw data')
+            st.write(df.head(50))
