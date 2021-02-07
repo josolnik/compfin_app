@@ -1,4 +1,4 @@
-# CompFin app repo
+# CompFin app repo [![Open in Streamlit](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://share.streamlit.io/josolnik/compfin_app/main/app.py)
 
 This is a collection of three data tools to explore computational modeling in finance:
 
